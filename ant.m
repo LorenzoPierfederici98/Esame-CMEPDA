@@ -20,12 +20,14 @@ classdef ant
         end
 
         function vox_value = pheromone_release(A, eta, x, y, z)
-            vox_value = eta + 10*A(x, y, z);
+            vox_value = eta + A(x, y, z);
         end
 
         function E = update_energy(e, alfa, pheromone, pheromone_mean)
+            %L'energia è aggiornata in modo che la formica non compia più
+            %di 2 passi in una zona senza feromoni.
             if pheromone == 0
-                E = e;
+                E = e - alfa;
             else
                 E = e - alfa*(1 - pheromone/pheromone_mean);
             end
@@ -60,34 +62,34 @@ classdef ant
             X = X'; %i vettori colonna vengono trasposti in vettori riga
             Y = Y';
             Z = Z';
-            if isempty(find(X==1))~=1 && x~= 1
-                X(find(X==1)) = x-1;
+            if isempty(find(X==1, 1))~=1 && x~= 1
+                X(X==1) = x-1;
             end
-            if isempty(find(X==2))~=1 && x~= 1
-                X(find(X==2)) = x;
+            if isempty(find(X==2, 1))~=1 && x~= 1
+                X(X==2) = x;
             end
-            if isempty(find(X==3))~=1&& x~=size(B,1)
-                X(find(X==3)) = x+1;
+            if isempty(find(X==3, 1))~=1&& x~=size(B,1)
+                X(X==3) = x+1;
             end
             
-            if isempty(find(Y==1))~=1 && y~= 1
-                Y(find(Y==1)) = y-1;
+            if isempty(find(Y==1, 1))~=1 && y~= 1
+                Y(Y==1) = y-1;
             end
-            if isempty(find(Y==2))~=1 && y~= 1
-                Y(find(Y==2)) = y;
+            if isempty(find(Y==2, 1))~=1 && y~= 1
+                Y(Y==2) = y;
             end
-            if isempty(find(Y==3))~=1&& y~=size(B,2)
-                Y(find(Y==3)) = y+1;
+            if isempty(find(Y==3, 1))~=1&& y~=size(B,2)
+                Y(Y==3) = y+1;
             end
 
-            if isempty(find(Z==1))~=1 && z~= 1
-                Z(find(Z==1)) = z-1;
+            if isempty(find(Z==1, 1))~=1 && z~= 1
+                Z(Z==1) = z-1;
             end
-            if isempty(find(Z==2))~=1 && z~= 1
-                Z(find(Z==2)) = z;
+            if isempty(find(Z==2, 1))~=1 && z~= 1
+                Z(Z==2) = z;
             end
-            if isempty(find(Z==3))~=1&& z~=size(B,3)
-                Z(find(Z==3)) = z+1;
+            if isempty(find(Z==3, 1))~=1&& z~=size(B,3)
+                Z(Z==3) = z+1;
             end
 
             Mat = [X; Y; Z];
@@ -97,22 +99,13 @@ classdef ant
                 z1 = Mat(3, i);
                 W = [W,(1 + B(x1, y1, z1, 1)./(1 + delta*B(x1, y1, z1, 1))).^beta];
             end
-
-            %W(find(W==(1 + B(x, y, z)./(1 + 0.2*B(x, y, z))).^3.5)) = []; %rimuovo il voxel corrente x, y, z
+            
             W = reshape(W, 1, []);
             %W contiene le probabilità di passare ai voxel primi vicini  
             W = W./sum(W); %probabilità di transizione ad un voxel
             P = cumsum(W);
             num = rand(); %numero causale fra 0 e 1
             j = find(P>=num, 1); %il primo indice per cui P(i)>=num
-            %J = zeros(length(X), length(Y), length(Z));
-            %J = reshape(1:length(W), [length(X), length(Y), length(Z)]); %J contiene tutti i possibili j (da 1 a length(W))
-            %[nextvox_x, nextvox_y, nextvox_z] = findND(J==j) %trova gli indici della posizione di j, che saranno le coordinate del prossimo voxel
-            %if isempty(j) == 1
-                %[M, I] = max(W);
-                %j = I;
-            %end
-            W = zeros(size(W));
             output = [X(j), Y(j), Z(j)];
         end
     end
