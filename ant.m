@@ -36,14 +36,21 @@ classdef ant < handle
     properties
         x;  
         y;  
-        z;        
-        number = 1;
-        energy = 1.2;  
+        z; 
     end
-    
-    methods (Static)
+    properties (SetAccess = private)
+        alfa = 0.2;
+        eta = 0.01;
+        delta = 0.2;
+        beta = 3.5;
+        energy = 1.2;
+        number = 1;
 
-        function im_here = mark_voxel(B, x, y, z)
+    end
+
+    methods
+
+        function im_here = mark_voxel(obj, B)
             % Marca il voxel presente.
             %
             % Args
@@ -62,21 +69,21 @@ classdef ant < handle
             %           Valore assegnato al voxel in cui è presente la
             %           formica per segnalarne la presenza.
 
-            B(x, y, z, 2) = true;
-            im_here = B(x, y, z, 2);
+            B(obj.x, obj.y, obj.z, 2) = true;
+            im_here = B(obj.x, obj.y, obj.z, 2);
 
         end
 
-        function im_here = leave_voxel(B, x, y, z)
+        function im_here = leave_voxel(obj, B)
             % Vedi mark_voxel. Il voxel assume il valore false quando la
             % formica si sposta.
 
-            B(x, y, z, 2) = false;
-            im_here = B(x, y, z, 2);
+            B(obj.x, obj.y, obj.z, 2) = false;
+            im_here = B(obj.x, obj.y, obj.z, 2);
 
         end
 
-        function vox_value = pheromone_release(A, eta, x, y, z)
+        function vox_value = pheromone_release(obj, A)
             % Compone la mappa del feromone tramite un rilascio
             % proporzionale alla intensità del voxel dell'immagine
             % originale, con un  offset 'eta' che la formica rilascia anche 
@@ -99,11 +106,11 @@ classdef ant < handle
             % vox_value : double
             %             Quantità di feromone rilasciato.
 
-            vox_value = eta + (A(x, y, z) - min(A(:)));
+            vox_value = obj.eta + (A(obj.x, obj.y, obj.z) - min(A(:)));
 
         end
 
-        function E = update_energy(e, alfa, pheromone, pheromone_mean)
+        function update_energy(obj, pheromone, pheromone_mean)
             % Aggiorna l'energia della formica in base alla quantità di
             % feromone rilasciato dalla singola formica e dalla media di
             % feromone rilasciato da tutta la colonia dall'inizio
@@ -134,16 +141,19 @@ classdef ant < handle
             % ------
             % E : double
             %     L'energia aggiornata della formica.
-
             if pheromone == 0
-                E = e - alfa;
+                obj.energy = obj.energy - obj.alfa;
             else
-                E = e - alfa*(1 - pheromone/pheromone_mean);
+                obj.energy = obj.energy - obj.alfa*(1 - pheromone/pheromone_mean);
             end
 
         end
 
-        function next_voxel = evaluate_destination(B, delta, beta, x, y, z)
+        function e = get_energy(obj)
+            e = obj.energy;
+        end
+
+        function next_voxel = evaluate_destination(obj, B)
             % Valuta la prossima destinazione della formica in base alle
             % dimensioni della matrice dell'immagine ed ai voxel liberi.
             % Vengono trovati i voxel primi vicini a quello di partenza in
@@ -185,25 +195,25 @@ classdef ant < handle
 
             % Trova i primi vicini, le cui coordinate vengono salvate negli
             % array a, b e c, considerando le dimensioni della matrice
-            if x ~=size(B, 1) &&  x ~= 1 
-                a = x-1:x+1;
-            elseif x==size(B,1)
+            if obj.x ~=size(B, 1) &&  obj.x ~= 1 
+                a = obj.x-1:obj.x+1;
+            elseif obj.x==size(B,1)
                 a = size(B,1)-1: size(B,1);
-            elseif x==1
+            elseif obj.x==1
                 a = 1:2;
             end
-            if y ~=size(B, 2) &&  y ~= 1 
-                b = y-1:y+1;
-            elseif y==size(B,2)
+            if obj.y ~=size(B, 2) &&  obj.y ~= 1 
+                b = obj.y-1:obj.y+1;
+            elseif obj.y==size(B,2)
                 b = size(B,2)-1: size(B,2);
-            elseif y==1
+            elseif obj.y==1
                 b = 1:2;
             end
-            if z ~=size(B, 3) &&  z ~= 1 
-                c = z-1:z+1;
-            elseif z==size(B,3)
+            if obj.z ~=size(B, 3) &&  obj.z ~= 1 
+                c = obj.z-1:obj.z+1;
+            elseif obj.z==size(B,3)
                 c = size(B,3)-1:size(B,3);
-            elseif z==1
+            elseif obj.z==1
                 c = 1:2;
             end
             
@@ -219,34 +229,34 @@ classdef ant < handle
             % findND fornisce degli indici 1, 2 e 3 della sottomatrice
             % length(a)*length(b)*length(c) della mappa del feromone. Gli
             % indici vengono riconvertiti in coordinate
-            if isempty(find(X==1, 1))~=1 && x~= 1
-                X(X==1) = x-1;
+            if isempty(find(X==1, 1))~=1 && obj.x~= 1
+                X(X==1) = obj.x-1;
             end
-            if isempty(find(X==2, 1))~=1 && x~= 1
-                X(X==2) = x;
+            if isempty(find(X==2, 1))~=1 && obj.x~= 1
+                X(X==2) = obj.x;
             end
-            if isempty(find(X==3, 1))~=1&& x~=size(B,1)
-                X(X==3) = x+1;
+            if isempty(find(X==3, 1))~=1&& obj.x~=size(B,1)
+                X(X==3) = obj.x+1;
             end
             
-            if isempty(find(Y==1, 1))~=1 && y~= 1
-                Y(Y==1) = y-1;
+            if isempty(find(Y==1, 1))~=1 && obj.y~= 1
+                Y(Y==1) = obj.y-1;
             end
-            if isempty(find(Y==2, 1))~=1 && y~= 1
-                Y(Y==2) = y;
+            if isempty(find(Y==2, 1))~=1 && obj.y~= 1
+                Y(Y==2) = obj.y;
             end
-            if isempty(find(Y==3, 1))~=1&& y~=size(B,2)
-                Y(Y==3) = y+1;
+            if isempty(find(Y==3, 1))~=1&& obj.y~=size(B,2)
+                Y(Y==3) = obj.y+1;
             end
 
-            if isempty(find(Z==1, 1))~=1 && z~= 1
-                Z(Z==1) = z-1;
+            if isempty(find(Z==1, 1))~=1 && obj.z~= 1
+                Z(Z==1) = obj.z-1;
             end
-            if isempty(find(Z==2, 1))~=1 && z~= 1
-                Z(Z==2) = z;
+            if isempty(find(Z==2, 1))~=1 && obj.z~= 1
+                Z(Z==2) = obj.z;
             end
-            if isempty(find(Z==3, 1))~=1&& z~=size(B,3)
-                Z(Z==3) = z+1;
+            if isempty(find(Z==3, 1))~=1&& obj.z~=size(B,3)
+                Z(Z==3) = obj.z+1;
             end
             
             % X, Y, Z vengono disposti in una matrice di dimensioni
@@ -258,7 +268,7 @@ classdef ant < handle
                 x1 = Mat(1, i);
                 y1 = Mat(2, i);
                 z1 = Mat(3, i);
-                W = [W,(1 + B(x1, y1, z1, 1)./(1 + delta*B(x1, y1, z1, 1))).^beta];
+                W = [W,(1 + B(x1, y1, z1, 1)./(1 + obj.delta*B(x1, y1, z1, 1))).^obj.beta];
             end
            
             W = reshape(W, 1, []);
