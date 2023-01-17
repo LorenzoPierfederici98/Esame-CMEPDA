@@ -4,7 +4,7 @@ classdef ant < handle
     % Classe che rappresenta la singola formica.
     % Attributi pubblici: 
     %  x, y, z : int
-    %            Le coordinate del voxel in cui Ë presente la formica.
+    %            Le coordinate del voxel in cui √® presente la formica.
     %
     % Attributi privati:
     %  number : int
@@ -17,14 +17,14 @@ classdef ant < handle
     %
     %  alfa, eta, delta, beta : double
     %                           Costanti che determinano l'evoluzione del
-    %                           sistema.
+    %                           sistema
     % Metodi:
     %  mark_voxel : implementa la segnalazione alla colonia della
-    %  presenza della formica nel voxel, cosÏ che questo non sia una
+    %  presenza della formica nel voxel, cos√¨ che questo non sia una
     %  destinazione possibile per altre formiche;
     %
     %  leave_voxel : implementa la segnalazione alla colonia che la
-    %  formica ha lasciato il voxel, cosÏ che questo possa essere visitato
+    %  formica ha lasciato il voxel, cos√¨ che questo possa essere visitato
     %  da altre formiche;
     %
     %  pheromone_release : implementa il rilascio di feromone da parte
@@ -61,13 +61,13 @@ classdef ant < handle
             % ------
             % B : 4d array di double
             %     La mappa del feromone. La quarta dimensione consente di
-            %     attribuire un valore true (=1) o false (=0) se Ë o meno
+            %     attribuire un valore true (=1) o false (=0) se √® o meno
             %     presente una formica.
             %
             % Output
             % ------
             % im_here : bool
-            %           Valore assegnato al voxel in cui Ë presente la
+            %           Valore assegnato al voxel in cui √® presente la
             %           formica per segnalarne la presenza.
 
             B(obj.x, obj.y, obj.z, 2) = true;
@@ -86,9 +86,9 @@ classdef ant < handle
 
         function vox_value = pheromone_release(obj, A)
             % Compone la mappa del feromone tramite un rilascio
-            % proporzionale alla differenza fra l'intensit‡ del voxel
-            % dell'immagine originale e del minimo valore di intensit‡, con 
-            % un  offset 'eta' che la formica rilascia anche ad intensit‡ 
+            % proporzionale alla differenza fra l'intensit√† del voxel
+            % dell'immagine originale e del minimo valore di intensit√†, con 
+            % un  offset 'eta' che la formica rilascia anche ad intensit√† 
             % del voxel nulla.
             %
             % Args
@@ -99,28 +99,27 @@ classdef ant < handle
             % Output
             % ------
             % vox_value : double
-            %             Quantit‡ di feromone rilasciato.
+            %             Quantit√† di feromone rilasciato.
 
             vox_value = obj.eta + (A(obj.x, obj.y, obj.z) - min(A(:)));
 
         end
 
         function update_energy(obj, pheromone, pheromone_mean)
-            % L'attributo energy della formica viene aggiornato in base 
-            % alla quantit‡ di feromone rilasciato dalla singola formica e 
-            % dalla media di feromone rilasciato da tutta la colonia dallo
-            % inizio dell'evoluzione. L'aggiornamento Ë fatto in modo che
-            % la formica non compia pi˘ di 2 passi in una zona senza
-            % feromone.
+            % Aggiorna l'energia della formica in base alla quantit√† di
+            % feromone rilasciato dalla singola formica e dalla media di
+            % feromone rilasciato da tutta la colonia dall'inizio
+            % dell'evoluzione. L'aggiornamento √® fatto in modo che la
+            % formica non compia pi√π di 2 passi in una zona senza feromone.
             %
             % Args
             % ------
             % pheromone : double
-            %             La quantit‡ di feromone al netto della costante
+            %             La quantit√† di feromone al netto della costante
             %             eta.
             %
             % pheromone_mean : double
-            %                  La media della quantit‡ di feromone
+            %                  La media della quantit√† di feromone
             %                  rilasciata da tutta la coloniadall'inizio
             %                  dell'evoluzione.
             %
@@ -146,17 +145,17 @@ classdef ant < handle
             % Vengono trovati i voxel primi vicini a quello di partenza in
             % cui non sia presente un'altra formica e che non superino una
             % certa soglia di feromone; ad ognuno viene assegnata una 
-            % probabilit‡ di transizione che tiene conto della quantit‡ di 
+            % probabilit√† di transizione che tiene conto della quantit√† di 
             % feromone al suo interno. Viene quindi applicato un algoritmo 
             % "roulette wheel" per scegliere il voxel di destinazione.
             % Gli attributi x, y, z vengono aggiornati come coordinate del
-            % voxel scelto.
+            % vo
             %
             % Args
             % ------
             % pheromone_thr : double
             %                 Soglia di feromone oltre la quale un certo
-            %                 voxel non rappresenti pi˘ una possibile
+            %                 voxel non rappresenti pi√π una possibile
             %                 destinazione.
             %
             % B : 4d array di double
@@ -197,7 +196,7 @@ classdef ant < handle
                 c = 1:2;
             end
             
-            W = [];  % Calcola e salva in array le quantit‡ W per ogni possibile
+            W = [];  % Calcola e salva in array le quantit√† W per ogni possibile
                      % voxel di destinazione
 
             [X, Y, Z] = findND(B(a, b, c, 2)==false & B(a, b, c, 1)<=pheromone_thr);  % Seleziona solo i voxel primi vicini liberi
@@ -244,7 +243,7 @@ classdef ant < handle
             end
             
             % X, Y, Z vengono disposti in una matrice di dimensioni
-            % 3*(numero di primi vicini liberi). Ogni colonna Ë quindi
+            % 3*(numero di primi vicini liberi). Ogni colonna √® quindi
             % composta dalle coordinate di un possibile voxel di
             % destinazione. Per ogni voxel viene calcolato un elemento di W
             Mat = [X; Y; Z];
@@ -258,11 +257,11 @@ classdef ant < handle
             W = reshape(W, 1, []);
 
             % Algoritmo roulette wheel: viene calcolato l'array di
-            % probabilit‡ P di passare ad ogni possibile voxel di
+            % probabilit√† P di passare ad ogni possibile voxel di
             % destinazione, corrispondente ad un certo indice di W. Viene
             % quindi estratto un numero casuale fra 0 e 1, num, e viene
             % selezionato il primo indice di P, j, tale che P(j)>=num, che 
-            % corrisponder‡ all'indice del voxel di destinazione
+            % corrisponder√† all'indice del voxel di destinazione
 
             P = cumsum(W./sum(W));
             num = rand();

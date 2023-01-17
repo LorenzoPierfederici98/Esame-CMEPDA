@@ -20,9 +20,10 @@ classdef Pheromone_map
             % true (=1) o false (=0) rispettivamente se è già occupato o
             % meno. Ogni voxel ha un valore false inizialmente.
             %
-            % Args
+            % Output
             % ----
-            % A : 
+            % B : 4d array di double
+            %     La mappa del feromone inizializzata.
             B = zeros(size(obj.A,1), size(obj.A,2), size(obj.A,3), 2);
         end
     end
