@@ -175,28 +175,11 @@ classdef ant < handle
 
             % Trova i primi vicini, le cui coordinate vengono salvate negli
             % array a, b e c, considerando le dimensioni della matrice
-            if obj.x ~=size(B, 1) &&  obj.x ~= 1 
-                a = obj.x-1:obj.x+1;
-            elseif obj.x==size(B,1)
-                a = size(B,1)-1: size(B,1);
-            elseif obj.x==1
-                a = 1:2;
-            end
-            if obj.y ~=size(B, 2) &&  obj.y ~= 1 
-                b = obj.y-1:obj.y+1;
-            elseif obj.y==size(B,2)
-                b = size(B,2)-1: size(B,2);
-            elseif obj.y==1
-                b = 1:2;
-            end
-            if obj.z ~=size(B, 3) &&  obj.z ~= 1 
-                c = obj.z-1:obj.z+1;
-            elseif obj.z==size(B,3)
-                c = size(B,3)-1:size(B,3);
-            elseif obj.z==1
-                c = 1:2;
-            end
-            
+            first_neigh = find_first_neigh(B, obj.x, obj.y, obj.z);
+            a = first_neigh{1};
+            b = first_neigh{2};
+            c = first_neigh{3};
+
             W = [];  % Calcola e salva in array le quantità W per ogni possibile
                      % voxel di destinazione
 

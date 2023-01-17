@@ -17,7 +17,7 @@ classdef ant < handle
     %
     %  alfa, eta, delta, beta : double
     %                           Costanti che determinano l'evoluzione del
-    %                           sistema
+    %                           sistema.
     % Metodi:
     %  mark_voxel : implementa la segnalazione alla colonia della
     %  presenza della formica nel voxel, così che questo non sia una
@@ -106,11 +106,12 @@ classdef ant < handle
         end
 
         function update_energy(obj, pheromone, pheromone_mean)
-            % Aggiorna l'energia della formica in base alla quantità di
-            % feromone rilasciato dalla singola formica e dalla media di
-            % feromone rilasciato da tutta la colonia dall'inizio
-            % dell'evoluzione. L'aggiornamento è fatto in modo che la
-            % formica non compia più di 2 passi in una zona senza feromone.
+            % L'attributo energy della formica viene aggiornato in base 
+            % alla quantità di feromone rilasciato dalla singola formica e 
+            % dalla media di feromone rilasciato da tutta la colonia dallo
+            % inizio dell'evoluzione. L'aggiornamento è fatto in modo che
+            % la formica non compia più di 2 passi in una zona senza
+            % feromone.
             %
             % Args
             % ------
@@ -149,7 +150,7 @@ classdef ant < handle
             % feromone al suo interno. Viene quindi applicato un algoritmo 
             % "roulette wheel" per scegliere il voxel di destinazione.
             % Gli attributi x, y, z vengono aggiornati come coordinate del
-            % vo
+            % voxel scelto.
             %
             % Args
             % ------
@@ -174,28 +175,11 @@ classdef ant < handle
 
             % Trova i primi vicini, le cui coordinate vengono salvate negli
             % array a, b e c, considerando le dimensioni della matrice
-            if obj.x ~=size(B, 1) &&  obj.x ~= 1 
-                a = obj.x-1:obj.x+1;
-            elseif obj.x==size(B,1)
-                a = size(B,1)-1: size(B,1);
-            elseif obj.x==1
-                a = 1:2;
-            end
-            if obj.y ~=size(B, 2) &&  obj.y ~= 1 
-                b = obj.y-1:obj.y+1;
-            elseif obj.y==size(B,2)
-                b = size(B,2)-1: size(B,2);
-            elseif obj.y==1
-                b = 1:2;
-            end
-            if obj.z ~=size(B, 3) &&  obj.z ~= 1 
-                c = obj.z-1:obj.z+1;
-            elseif obj.z==size(B,3)
-                c = size(B,3)-1:size(B,3);
-            elseif obj.z==1
-                c = 1:2;
-            end
-            
+            first_neigh = find_first_neigh(B, obj.x, obj.y, obj.z);
+            a = first_neigh(:, 1);
+            b = first_neigh(:, );
+            c = first_neigh(3, :);
+
             W = [];  % Calcola e salva in array le quantità W per ogni possibile
                      % voxel di destinazione
 
