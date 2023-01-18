@@ -1,12 +1,11 @@
 
-classdef ant < handle
+classdef ant 
 
     % Classe che rappresenta la singola formica.
-    % Attributi pubblici: 
+    % Attributi: 
     %  x, y, z : int
     %            Le coordinate del voxel in cui è presente la formica.
     %
-    % Attributi privati:
     %  number : int
     %           Un numero che tiene conto di tutte le formiche nello
     %           ambiente.
@@ -40,15 +39,15 @@ classdef ant < handle
     properties
         x;  
         y;  
-        z; 
+        z;
+        energy = 1.2;
     end
     properties (SetAccess = private)
         alfa = 0.2;
-        eta = 0.01;
-        delta = 0.2;
         beta = 3.5;
-        energy = 1.2;
-        number = 1;
+        delta = 0.2;        
+        eta = 0.01;
+        propor_factor = 1;
 
     end
 
@@ -101,11 +100,11 @@ classdef ant < handle
             % vox_value : double
             %             Quantità di feromone rilasciato.
 
-            vox_value = obj.eta + (A(obj.x, obj.y, obj.z) - min(A(:)));
+            vox_value = obj.eta + obj.propor_factor*(A(obj.x, obj.y, obj.z) - min(A(:)));
 
         end
 
-        function update_energy(obj, pheromone, pheromone_mean)
+        function Energy = update_energy(obj, pheromone, pheromone_mean)
             % L'attributo energy della formica viene aggiornato in base 
             % alla quantità di feromone rilasciato dalla singola formica e 
             % dalla media di feromone rilasciato da tutta la colonia dallo
@@ -126,19 +125,32 @@ classdef ant < handle
             %
             % Output
             % ------
-            % L'energia aggiornata della formica.
+            % Energy : double
+            %          L'energia aggiornata della formica.
 
             if pheromone == 0
-                obj.energy = obj.energy - obj.alfa;
+                Energy = obj.energy - obj.alfa;
             else
-                obj.energy = obj.energy - obj.alfa*(1 - pheromone/pheromone_mean);
+                Energy = obj.energy - obj.alfa*(1 - pheromone/pheromone_mean);
             end
 
         end
 
-        function e = get_energy(obj)
-            e = obj.energy;
+        function obj = set.energy(obj, value)
+            obj.energy = value;
         end
+
+        function obj = set.x(obj, value)
+            obj.x = value;
+        end
+    
+        function obj = set.y(obj, value)
+            obj.y = value;
+        end
+
+        function obj = set.z(obj, value)
+            obj.z = value;
+        end   
 
         function next_voxel = evaluate_destination(obj, pheromone_thr, B)
             % Valuta la prossima destinazione della formica in base alle
@@ -184,10 +196,10 @@ classdef ant < handle
                      % voxel di destinazione
 
             [X, Y, Z] = findND(B(a, b, c, 2)==false & B(a, b, c, 1)<=pheromone_thr);  % Seleziona solo i voxel primi vicini liberi
-            
+                                                                                      % con un valore di feromone minore della soglia
             if isempty([X, Y, Z])==1
-                disp('Nessuna destinazione possibile')
                 next_voxel = [];
+                return
             end
             X = X';  % I vettori colonna vengono trasposti in vettori riga
             Y = Y';  % X, Y, Z sono array di lunghezza pari al numero di primi vicini liberi
@@ -252,9 +264,6 @@ classdef ant < handle
             j = find(P>=num, 1);  
             next_voxel = [X(j), Y(j), Z(j)];
 
-            obj.x = next_voxel(1);
-            obj.y = next_voxel(2);
-            obj.z = next_voxel(3);
         end
     end
 

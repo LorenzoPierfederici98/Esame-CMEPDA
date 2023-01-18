@@ -14,7 +14,19 @@ function first_neighbours = find_first_neigh(B, x, y, z)
          % first_neighbours : 2d cell array di int
          %                    Le colonne rappresentano rispettivamente le
          %                    coordinate x, y, z dei primi vicini.
-                  
+            if x <= 0 
+                err = MException('x:ValueError', 'Valore di x non consentito, inserire un altro valore.');
+                throw(err)                
+            end
+            if y <= 0 
+                err = MException('y:ValueError', 'Valore di y non consentito, inserire un altro valore.');
+                throw(err)                
+            end
+            if z <= 0 
+                err = MException('z:ValueError', 'Valore di z non consentito, inserire un altro valore.');
+                throw(err)                
+            end            
+            
             if x ~=size(B, 1) &&  x ~= 1 
                 a = x-1:x+1;
             elseif x==size(B,1)
@@ -22,12 +34,16 @@ function first_neighbours = find_first_neigh(B, x, y, z)
             elseif x==1
                 a = 1:2;
             end
+
             if y ~=size(B, 2) &&  y ~= 1 
                 b = y-1:y+1;
             elseif y==size(B,2)
                 b = size(B,2)-1: size(B,2);
             elseif y==1
                 b = 1:2;
+            else
+                err = MException('MyComponent:ValueError', 'Valore di y non consentito, inserire un altro valore.');
+                throw(err)
             end
             if z ~=size(B, 3) && z ~= 1 
                 c = z-1:z+1;
@@ -35,6 +51,9 @@ function first_neighbours = find_first_neigh(B, x, y, z)
                 c = size(B,3)-1:size(B,3);
             elseif z==1
                 c = 1:2;
+            else
+                err = MException('MyComponent:ValueError', 'Valore di z non consentito, inserire un altro valore.');
+                throw(err)                
             end
             first_neighbours{1} = a;
             first_neighbours{2} = b;
