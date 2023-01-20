@@ -47,7 +47,7 @@ classdef ant
         beta = 3.5;
         delta = 0.2;        
         eta = 0.01;
-        propor_factor = 10;
+        propor_factor = 1;
 
     end
 
@@ -198,7 +198,6 @@ classdef ant
             [X, Y, Z] = findND(B(a, b, c, 2)==false & B(a, b, c, 1)<=pheromone_thr);  % Seleziona solo i voxel primi vicini liberi
                                                                                       % con un valore di feromone minore della soglia
             if isempty([X, Y, Z])==1
-                disp('Nessuna destinazione possibile')
                 next_voxel = [];
                 return
             end

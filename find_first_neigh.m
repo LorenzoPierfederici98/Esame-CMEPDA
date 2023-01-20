@@ -14,15 +14,15 @@ function first_neighbours = find_first_neigh(B, x, y, z)
          % first_neighbours : 2d cell array di int
          %                    Le colonne rappresentano rispettivamente le
          %                    coordinate x, y, z dei primi vicini.
-            if x <= 0 
+            if x <= 0 || isnan(x) || isempty(x)==1 
                 err = MException('x:ValueError', 'Valore di x non consentito, inserire un altro valore.');
                 throw(err)                
             end
-            if y <= 0 
+            if y <= 0 || isnan(y) || isempty(y)==1 
                 err = MException('y:ValueError', 'Valore di y non consentito, inserire un altro valore.');
                 throw(err)                
             end
-            if z <= 0 
+            if z <= 0 || isnan(z) || isempty(z)==1 
                 err = MException('z:ValueError', 'Valore di z non consentito, inserire un altro valore.');
                 throw(err)                
             end            
