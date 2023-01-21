@@ -1,6 +1,8 @@
 function first_neighbours = find_first_neigh(B, x, y, z)
          % Funzione che trova le coordinate dei voxel primi vicini al voxel
-         % (x, y, z) considerando le dimensioni della matrice B.
+         % (x, y, z) considerando le dimensioni della matrice B. Utilizzata
+         % nel metodo evaluate_destination della classe ant e nella
+         % funzione initialize_coordinates.
          %
          % Args
          % ----
@@ -14,6 +16,13 @@ function first_neighbours = find_first_neigh(B, x, y, z)
          % first_neighbours : 2d cell array di int
          %                    Le colonne rappresentano rispettivamente le
          %                    coordinate x, y, z dei primi vicini.
+         %
+         % See also
+         % --------
+         % ant.evaluate_destination
+         %
+         % initialize_coordinates.m
+
             if x <= 0 || isnan(x) || isempty(x)==1 
                 err = MException('x:ValueError', 'Valore di x non consentito, inserire un altro valore.');
                 throw(err)                

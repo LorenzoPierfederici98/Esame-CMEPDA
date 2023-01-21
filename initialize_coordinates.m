@@ -1,17 +1,33 @@
-function Coordinates = initialize_coordinates(B, Ant, x, y, z)
-        % Inizializza le coordinate dei voxel delle prime formiche
-Coordinates = [];
-neighbours = find_first_neigh(B, x, y, z);
-a = neighbours{1};
-b = neighbours{2};
-c = neighbours{3};
-All_first_neighbours = combvec(a, b, c);  % Matrice le cui colonne sono le coordinate di tutti i voxel vicini a x, y, z
+function Coordinates = initialize_coordinates(A, N_start, x, y, z)
+        % Inizializza le coordinate dei voxel delle prime N_start formiche
+        % selezionando casualmente le coordinate dei voxel primi vicini.
+        %
+        % Args
+        % ----
+        % B : 3d array di double
+        %     La matrice dell'immagine.
+        %
+        % N_start : int
+        %           Numero iniziale di formiche.
+        %
+        % x, y, z : int
+        %           Le coordinate del voxel iniziale.
+        %
+        % Output
+        % ------
+        % Coordinates : 2d array di double
+        %               Ogni riga contiene le coordinate degli N_start
+        %               voxel da assegnare alle formiche.
+        %
+        % See also
+        % --------
+        % randperm
 
-j = 1;
-for i=1:length(Ant)
-    Ant(i).x = All_first_neighbours(1,j);
-    Ant(i).y = All_first_neighbours(2,j);
-    Ant(i).z = All_first_neighbours(3,j);
-    Coordinates = [Coordinates; Ant(i).x, Ant(i).y, Ant(i).z];
-    j = j + 1;
+Coordinates = [];
+neighbours = find_first_neigh(A, x, y, z);
+all_first_neighbours = combvec(neighbours{1}, neighbours{2}, neighbours{3});  % Matrice le cui colonne sono le coordinate di tutti i voxel vicini a x, y, z
+
+unique_combinations = randperm(N_start);  % Sequenza di numeri casuali senza ripetizioni per selezionare le colonne di all_first_neighbours
+for j=1:N_start
+    Coordinates = [Coordinates; all_first_neighbours(1,unique_combinations(j)), all_first_neighbours(2,unique_combinations(j)), all_first_neighbours(3,unique_combinations(j))];
 end
