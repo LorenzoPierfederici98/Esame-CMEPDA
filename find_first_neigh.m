@@ -41,20 +41,16 @@ function first_neighbours = find_first_neigh(B, x, y, z)
                 b = size(B,2)-1: size(B,2);
             elseif y==1
                 b = 1:2;
-            else
-                err = MException('MyComponent:ValueError', 'Valore di y non consentito, inserire un altro valore.');
-                throw(err)
             end
+
             if z ~=size(B, 3) && z ~= 1 
                 c = z-1:z+1;
             elseif z==size(B,3)
                 c = size(B,3)-1:size(B,3);
             elseif z==1
                 c = 1:2;
-            else
-                err = MException('MyComponent:ValueError', 'Valore di z non consentito, inserire un altro valore.');
-                throw(err)                
             end
+
             first_neighbours{1} = a;
             first_neighbours{2} = b;
             first_neighbours{3} = c;

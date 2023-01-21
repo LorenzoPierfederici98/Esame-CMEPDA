@@ -185,68 +185,44 @@ classdef ant
             % findND : funzione che trova le coordinate di un ndarray che
             %          rispetti una certa condizione.
 
-            % Trova i primi vicini, le cui coordinate vengono salvate negli
-            % array a, b e c, considerando le dimensioni della matrice
+            % Trova i primi vicini, considerando le dimensioni della matrice
             first_neigh = find_first_neigh(B, obj.x, obj.y, obj.z);
-            a = first_neigh{1};
-            b = first_neigh{2};
-            c = first_neigh{3};
+
+            % Tutte le combinazioni delle coordinate dei primi vicini, ogni
+            % riga corrisponde alle coordinate x, y, z di un voxel primo
+            % vicino
+            first_neigh = combvec(first_neigh{1}, first_neigh{2}, first_neigh{3})';
 
             W = [];  % Calcola e salva in array le quantità W per ogni possibile
                      % voxel di destinazione
 
-            [X, Y, Z] = findND(B(a, b, c, 2)==false & B(a, b, c, 1)<=pheromone_thr);  % Seleziona solo i voxel primi vicini liberi
-                                                                                      % con un valore di feromone minore della soglia
-            if isempty([X, Y, Z])==1
+            [X, Y, Z] = findND(B(:, :, :, 2)==0 & B(:, :, :, 1)<=pheromone_thr);  % Seleziona solo i voxel liberi
+                                                                                  % con un valore di feromone minore della soglia
+            X = X';  % I vettori colonna vengono trasposti in vettori riga
+            Y = Y';  
+            Z = Z';
+                                                                           
+            if isempty([X; Y; Z])==1
                 next_voxel = [];
                 return
             end
-            X = X';  % I vettori colonna vengono trasposti in vettori riga
-            Y = Y';  % X, Y, Z sono array di lunghezza pari al numero di primi vicini liberi
-            Z = Z';
+             
+            % Vettore colonna con 1 o 0 a seconda che le coordinate dei
+            % primi vicini siano incluse in [X, Y, Z] o meno
+            valid_members = ismember(first_neigh, [X; Y; Z]', 'rows');
 
-            % findND fornisce degli indici 1, 2 e 3 della sottomatrice
-            % length(a)*length(b)*length(c) della mappa del feromone. Gli
-            % indici vengono riconvertiti in coordinate
-            if isempty(find(X==1, 1))~=1 && obj.x~= 1
-                X(X==1) = obj.x-1;
-            end
-            if isempty(find(X==2, 1))~=1 && obj.x~= 1
-                X(X==2) = obj.x;
-            end
-            if isempty(find(X==3, 1))~=1&& obj.x~=size(B,1)
-                X(X==3) = obj.x+1;
-            end
-            
-            if isempty(find(Y==1, 1))~=1 && obj.y~= 1
-                Y(Y==1) = obj.y-1;
-            end
-            if isempty(find(Y==2, 1))~=1 && obj.y~= 1
-                Y(Y==2) = obj.y;
-            end
-            if isempty(find(Y==3, 1))~=1&& obj.y~=size(B,2)
-                Y(Y==3) = obj.y+1;
-            end
+            % Seleziona solo i primi vicini che abbiano valore 1 in
+            % valid_members
+            valid_first_neigh = first_neigh(valid_members', :)';
 
-            if isempty(find(Z==1, 1))~=1 && obj.z~= 1
-                Z(Z==1) = obj.z-1;
-            end
-            if isempty(find(Z==2, 1))~=1 && obj.z~= 1
-                Z(Z==2) = obj.z;
-            end
-            if isempty(find(Z==3, 1))~=1&& obj.z~=size(B,3)
-                Z(Z==3) = obj.z+1;
-            end
-            
-            % X, Y, Z vengono disposti in una matrice di dimensioni
-            % 3*(numero di primi vicini liberi). Ogni colonna è quindi
-            % composta dalle coordinate di un possibile voxel di
-            % destinazione. Per ogni voxel viene calcolato un elemento di W
-            Mat = [X; Y; Z];
-            for i=1:length(X)
-                x1 = Mat(1, i);
-                y1 = Mat(2, i);
-                z1 = Mat(3, i);
+            % Ogni colonna di first_neigh è composta dalle coordinate di un 
+            % possibile voxel di destinazione. Per ogni voxel viene 
+            % calcolato un elemento di W
+ 
+            for i=1:size(valid_first_neigh, 2)
+                x1 = valid_first_neigh(1, i);
+                y1 = valid_first_neigh(2, i);
+                z1 = valid_first_neigh(3, i);
                 W = [W,(1 + B(x1, y1, z1, 1)./(1 + obj.delta*B(x1, y1, z1, 1))).^obj.beta];
             end
            
@@ -262,7 +238,7 @@ classdef ant
             P = cumsum(W./sum(W));
             num = rand();
             j = find(P>=num, 1);  
-            next_voxel = [X(j), Y(j), Z(j)];
+            next_voxel = [valid_first_neigh(1,j), valid_first_neigh(2, j), valid_first_neigh(3, j)];
 
         end
     end
