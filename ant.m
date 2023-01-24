@@ -45,23 +45,16 @@ classdef ant
     properties (SetAccess = private)
         alfa = 0.2;
         beta = 3.5;
-        delta = 0.2;        
+        delta = 2;        
         eta = 0.01;
         propor_factor = 1;
 
     end
 
-    methods
+    methods(Static)
 
-        function im_here = mark_voxel(obj, B)
+        function im_here = mark_voxel()
             % Marca il voxel presente.
-            %
-            % Args
-            % ------
-            % B : 4d array di double
-            %     La mappa del feromone. La quarta dimensione consente di
-            %     attribuire un valore true (=1) o false (=0) se è o meno
-            %     presente una formica.
             %
             % Output
             % ------
@@ -69,19 +62,19 @@ classdef ant
             %           Valore assegnato al voxel in cui è presente la
             %           formica per segnalarne la presenza.
 
-            B(obj.x, obj.y, obj.z, 2) = true;
-            im_here = B(obj.x, obj.y, obj.z, 2);
+            im_here = true;
 
         end
 
-        function im_here = leave_voxel(obj, B)
+        function im_here = leave_voxel()
             % Vedi mark_voxel. Il voxel assume il valore false quando la
             % formica si sposta.
 
-            B(obj.x, obj.y, obj.z, 2) = false;
-            im_here = B(obj.x, obj.y, obj.z, 2);
+            im_here = false;
 
         end
+    end
+    methods
 
         function vox_value = pheromone_release(obj, A)
             % Compone la mappa del feromone tramite un rilascio
