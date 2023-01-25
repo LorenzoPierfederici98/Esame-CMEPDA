@@ -145,7 +145,7 @@ classdef ant
             obj.z = value;
         end   
 
-        function next_voxel = evaluate_destination(obj, pheromone_thr, B)
+        function next_voxel = evaluate_destination(obj, B, A)
             % Valuta la prossima destinazione della formica in base alle
             % dimensioni della matrice dell'immagine ed ai voxel liberi.
             % Vengono trovati i voxel primi vicini a quello di partenza in
@@ -189,8 +189,8 @@ classdef ant
             W = [];  % Calcola e salva in array le quantità W per ogni possibile
                      % voxel di destinazione
 
-            [X, Y, Z] = findND(B(:, :, :, 2)==0 & B(:, :, :, 1)<=pheromone_thr);  % Seleziona solo i voxel liberi
-                                                                                  % con un valore di feromone minore della soglia
+            [X, Y, Z] = findND(B(:, :, :, 2)==0);  % Seleziona solo i voxel liberi
+                                                                                 
             X = X';  % I vettori colonna vengono trasposti in vettori riga
             Y = Y';  
             Z = Z';
@@ -208,17 +208,30 @@ classdef ant
             % valid_members. Ogni colonna rappresenta le coordinate x, y, z
             % di ogni possibile voxel di destinazione
             valid_first_neigh = first_neigh(valid_members', :)';
+            
+            pm = B(:, :, :, 1);
 
-            % Per ogni voxel viene calcolato un elemento di W
-            for i=1:size(valid_first_neigh, 2)
+            % Per ogni voxel viene calcolato un elemento di W. vengono
+            % tenuti solo i voxel che hanno un valore di feromone minore di
+            % una threshold, data dal prodotto fra la quantità di feromone
+            % rilasciabile nel voxel e dal numero massimo di visite nello
+            % stesso. Quest'ultimo è calcolato tenendo conto della quantità
+            % di feromone nel voxel e dalla massima e minima quantità di
+            % feromone rilasciata in tutta la pheromone_map
+            i = 1;
+            while i<=size(valid_first_neigh, 2)
                 x1 = valid_first_neigh(1, i);
                 y1 = valid_first_neigh(2, i);
                 z1 = valid_first_neigh(3, i);
-                W = [W,(1 + B(x1, y1, z1, 1)./(1 + obj.delta*B(x1, y1, z1, 1))).^obj.beta];
+                if B(x1, y1, z1, 1)<=(obj.eta + obj.propor_factor*(A(x1, y1, z1) - min(A(:))))*40
+                    W = [W,(1 + B(x1, y1, z1, 1)/(1 + obj.delta*B(x1, y1, z1, 1)))^obj.beta];
+                else
+                    valid_first_neigh(:,i)=[];
+                    continue
+                end
+                i = i + 1;
             end
-           
-            W = reshape(W, 1, []);
-
+            
             % Algoritmo roulette wheel: viene calcolato l'array di
             % probabilità P di passare ad ogni possibile voxel di
             % destinazione, corrispondente ad un certo indice di W. Viene
@@ -228,7 +241,7 @@ classdef ant
 
             P = cumsum(W./sum(W));
             num = rand();
-            j = find(P>=num, 1);  
+            j = find(P>=num, 1);         
             next_voxel = [valid_first_neigh(1,j), valid_first_neigh(2, j), valid_first_neigh(3, j)];
 
         end
