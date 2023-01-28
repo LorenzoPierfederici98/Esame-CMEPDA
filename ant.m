@@ -17,6 +17,11 @@ classdef ant
     %  alfa, eta, delta, beta : double
     %                           Costanti che determinano l'evoluzione del
     %                           sistema.
+    %
+    % propor_factor : double
+    %                 Il rilascio di feromone nel voxel è proporzionale
+    %                 all'intensità del voxel nell'immagine originale
+    %                 di un fattore propor_factor.
     % Metodi:
     %  mark_voxel : implementa la segnalazione alla colonia della
     %  presenza della formica nel voxel, così che questo non sia una
@@ -45,7 +50,7 @@ classdef ant
     properties (SetAccess = private)
         alfa = 0.2;
         beta = 3.5;
-        delta = 2;        
+        delta = 0.2;        
         eta = 0.01;
         propor_factor = 1;
 
@@ -145,7 +150,7 @@ classdef ant
             obj.z = value;
         end   
 
-        function next_voxel = evaluate_destination(obj, B, A)
+        function next_voxel = evaluate_destination(obj, B, A, N_threshold)
             % Valuta la prossima destinazione della formica in base alle
             % dimensioni della matrice dell'immagine ed ai voxel liberi.
             % Vengono trovati i voxel primi vicini a quello di partenza in
@@ -166,6 +171,12 @@ classdef ant
             %
             % B : 4d array di double
             %     La mappa del feromone.
+            %
+            % A : 3d array di double
+            %     Matrice originale dell'immagine.
+            % 
+            % N_threshold : int
+            %               Il numero massimo di visite per voxel.
             %
             % Output
             % ------
@@ -223,7 +234,7 @@ classdef ant
                 x1 = valid_first_neigh(1, i);
                 y1 = valid_first_neigh(2, i);
                 z1 = valid_first_neigh(3, i);
-                if B(x1, y1, z1, 1)<=(obj.eta + obj.propor_factor*(A(x1, y1, z1) - min(A(:))))*40
+                if B(x1, y1, z1, 1)<(obj.eta + obj.propor_factor*(A(x1, y1, z1) - min(A(:))))*N_threshold
                     W = [W,(1 + B(x1, y1, z1, 1)/(1 + obj.delta*B(x1, y1, z1, 1)))^obj.beta];
                 else
                     valid_first_neigh(:,i)=[];

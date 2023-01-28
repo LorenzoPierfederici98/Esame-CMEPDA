@@ -23,11 +23,12 @@ function Coordinates = initialize_coordinates(A, N_start, x, y, z)
         % --------
         % randperm
 
-Coordinates = [];
-neighbours = find_first_neigh(A, x, y, z);
-all_first_neighbours = combvec(neighbours{1}, neighbours{2}, neighbours{3});  % Matrice le cui colonne sono le coordinate di tutti i voxel vicini a x, y, z
+    Coordinates = [];
+    neighbours = find_first_neigh(A, x, y, z);
+    all_first_neighbours = combvec(neighbours{1}, neighbours{2}, neighbours{3});  % Matrice le cui colonne sono le coordinate di tutti i voxel vicini a x, y, z
 
-unique_combinations = randperm(N_start);  % Sequenza di numeri casuali senza ripetizioni per selezionare le colonne di all_first_neighbours
-for j=1:N_start
-    Coordinates = [Coordinates; all_first_neighbours(1,unique_combinations(j)), all_first_neighbours(2,unique_combinations(j)), all_first_neighbours(3,unique_combinations(j))];
+    unique_combinations = randperm(N_start);  % Sequenza di numeri casuali senza ripetizioni per selezionare le colonne di all_first_neighbours
+    for j=1:N_start
+        Coordinates = [Coordinates; all_first_neighbours(1,unique_combinations(j)), all_first_neighbours(2,unique_combinations(j)), all_first_neighbours(3,unique_combinations(j))];
+    end
 end
